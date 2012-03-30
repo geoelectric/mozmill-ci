@@ -38,7 +38,7 @@ def main():
     testrun = testrun
 
     script = testrun['script']
-    report_url = getattr(testrun, 'report', 'http://mozmill-ondemand.blargon7.com/db/')
+    report_url = 'report' in testrun and testrun['report'] or 'http://mozmill-ondemand.blargon7.com/db/'
 
     # Iterate through all target nodes
     for section in config.sections():
@@ -74,8 +74,19 @@ def main():
                     'PLATFORM': platform,
                     'REPORT_URL': report_url
                 }
+
+                if script == 'update' and 'target-build-id' in testrun:
+                    parameters['TARGET_BUILD_ID'] = testrun['target-build-id']
+                elif script == 'endurance':
+                    if 'delay' in testrun:
+                        parameters['DELAY'] = testrun['delay']
+                    if 'entities' in testrun:
+                        parameters['ENTITIES'] = testrun['entities']
+                    if 'iterations' in testrun:
+                        parameters['ITERATIONS'] = testrun['iterations']
+
                 #print 'Triggering job: ondemand_%s with %s' % (script, parameters)
-                self.jenkins.build_job('ondemand_%s' % testrun['script'], parameters)
+                self.jenkins.build_job('ondemand_%s' % script, parameters)
 
 if __name__ == "__main__":
     main()
