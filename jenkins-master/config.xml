@@ -147,6 +147,7 @@
         <comparator class="hudson.util.CaseInsensitiveComparator"/>
         <string>get_mozmill-environments</string>
         <string>tools</string>
+	<string>trigger-ondemand</string>
       </jobNames>
       <jobFilters/>
       <columns>
