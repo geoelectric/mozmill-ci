@@ -67,6 +67,7 @@ def main():
             for locale in locales:
                 parameters = {
                     'BUILD_TYPE': build_type,
+                    'VERSION': version,
                     'BUILD_NUMBER': build or '1',
                     'ENV_PLATFORM': get_mozmill_environment_platform(platform),
                     'LOCALE': locale,
@@ -85,7 +86,7 @@ def main():
                     if 'iterations' in testrun:
                         parameters['ITERATIONS'] = testrun['iterations']
 
-                #print 'Triggering job: ondemand_%s with %s' % (script, parameters)
+                print 'Triggering job: ondemand_%s with %s' % (script, parameters)
                 j.build_job('ondemand_%s' % script, parameters)
 
 if __name__ == "__main__":
