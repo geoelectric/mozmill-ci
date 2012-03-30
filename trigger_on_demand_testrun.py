@@ -1,14 +1,23 @@
 """ Script to create and trigger Firefox testruns in Jenkins. """
 
 import ConfigParser
-import os
 import re
 import sys
-import uuid
-import xml.dom.minidom
 
 import jenkins
 
+
+def get_mozmill_environment_platform(platform):
+    # Map to translate the platform to the mozmill environment platform
+
+    ENVIRONMENT_PLATFORM_MAP = {
+        'linux': 'linux',
+        'linux64': 'linux',
+        'mac': 'mac',
+        'win32': 'windows',
+        'win64': 'windows'
+    }
+    return ENVIRONMENT_PLATFORM_MAP[platform]
 
 def main():
     j = jenkins.Jenkins('http://localhost:8080')
@@ -28,9 +37,8 @@ def main():
         testrun.update({entry: config.get('testrun', entry)})
     testrun = testrun
 
-    # Define job and triggers
-    job_name = 'ondemand-%s-%s' % (testrun['script'], uuid.uuid4())
-    triggers = [ ]
+    script = testrun['script']
+    report_url = getattr(testrun, 'report', 'http://mozmill-ondemand.blargon7.com/db/')
 
     # Iterate through all target nodes
     for section in config.sections():
@@ -39,7 +47,6 @@ def main():
             continue
         platform = config.get(section, 'platform')
         node_labels = section.split(' ')
-        sub_job_name = '%s-%s' % (testrun['script'], '-'.join(node_labels))
 
         # Iterate through all builds per platform
         for entry in config.options(section):
@@ -57,37 +64,18 @@ def main():
             except:
                 continue
 
-            # Create triggered job for each listed locale
             for locale in locales:
-                triggers.append({
-                    'job_name': sub_job_name,
-                    'parameters': {
-                        'PLATFORM': platform,
-                        'BUILD_TYPE': build_type,
-                        'VERSION': version,
-                        'BUILD_NUMBER': build or '1',
-                        'LOCALE': locale
-                    }
-                })
-
-    # Create parameterized build triggers
-    pbt_template = open(os.path.join('templates', 'parameterized_build_trigger_config.xml')).read()
-    pbts = [ ]
-    for trigger in triggers:
-        pbts.append(pbt_template % {
-            'job_name': trigger['job_name'],
-            'parameters': '\n'.join(['%s=%s' % (k, v) for k, v in trigger['parameters'].items()])})
-
-    # Create on-demand-job
-    job_template = open(os.path.join('templates', 'on_demand_job.xml')).read()
-    job_config = xml.dom.minidom.parseString(job_template % {
-        'parameterized_build_trigger_config': '\n'.join(pbts)})
-    print 'Creating job: %s' % job_name
-    j.create_job(job_name, job_config.toxml())
-
-    # Trigger on-demand job
-    print 'Building job: %s' % job_name
-    j.build_job(job_name)
+                parameters = {
+                    'BUILD_TYPE': build_type,
+                    'BUILD_NUMBER': build or '1',
+                    'ENV_PLATFORM': get_mozmill_environment_platform(platform),
+                    'LOCALE': locale,
+                    'NODES': ' && '.join(node_labels),
+                    'PLATFORM': platform,
+                    'REPORT_URL': report_url
+                }
+                #print 'Triggering job: ondemand_%s with %s' % (script, parameters)
+                self.jenkins.build_job('ondemand_%s' % testrun['script'], parameters)
 
 if __name__ == "__main__":
     main()
