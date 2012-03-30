@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Execute functional tests for candidate builds.</description>
+  <description>Execute remote tests for release and candidate builds.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -84,7 +84,7 @@
       <executeFromWorkingDir>false</executeFromWorkingDir>
     </hudson.plugins.xshell.XShellBuilder>
     <hudson.plugins.xshell.XShellBuilder>
-      <commandLine>mozmill-env/run mozmill-automation/download.py --type=$BUILD_TYPE --platform=$PLATFORM --version=$VERSION --locale=$LOCALE --build-id=$BUILD_ID --directory=builds</commandLine>
+      <commandLine>mozmill-env/run mozmill-automation/download.py --type=$BUILD_TYPE --platform=$PLATFORM --version=$VERSION --locale=$LOCALE --build-number=$BUILD_NUMBER --directory=builds</commandLine>
       <executeFromWorkingDir>false</executeFromWorkingDir>
     </hudson.plugins.xshell.XShellBuilder>
     <hudson.plugins.xshell.XShellBuilder>
