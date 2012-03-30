@@ -86,7 +86,7 @@ def main():
                         parameters['ITERATIONS'] = testrun['iterations']
 
                 #print 'Triggering job: ondemand_%s with %s' % (script, parameters)
-                self.jenkins.build_job('ondemand_%s' % script, parameters)
+                j.build_job('ondemand_%s' % script, parameters)
 
 if __name__ == "__main__":
     main()
