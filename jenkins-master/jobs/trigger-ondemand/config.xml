@@ -7,7 +7,7 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.FileParameterDefinition>
-          <name>config.ini</name>
+          <name>ondemand.cfg</name>
           <description>Configuration File</description>
         </hudson.model.FileParameterDefinition>
       </parameterDefinitions>
@@ -23,7 +23,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>${JENKINS_HOME}/../jenkins-env/bin/python ${JENKINS_HOME}/../trigger_on_demand_testrun.py config.ini</command>
+      <command>${JENKINS_HOME}/../jenkins-env/bin/python ${JENKINS_HOME}/../trigger_on_demand_testrun.py ondemand.cfg</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
